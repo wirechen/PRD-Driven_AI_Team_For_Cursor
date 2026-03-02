@@ -17,6 +17,7 @@ is_background: true
 
 1. **web-design-guidelines**：阅读 `~/.cursor/skills/web-design-guidelines/SKILL.md`，在进行UI开发时使用 WebFetch 获取 `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md` 中的最新Web界面规范，确保UI代码符合Web最佳实践（可访问性、响应式设计、语义化HTML等）。
 2. **frontend-design**：阅读 `~/.cursor/skills/frontend-design/SKILL.md`，在构建页面和组件时遵循其设计思维流程和美学指南，创造独特、高品质、避免千篇一律AI风格的界面。
+3. **miniprogram-development**：阅读 `~/.agents/skills/miniprogram-development/SKILL.md`，在开发微信小程序页面、组件、云开发集成时遵循其规范，包括项目结构约定、认证特性、资源管理和开发工具使用等最佳实践。
 
 ## 职责范围
 
