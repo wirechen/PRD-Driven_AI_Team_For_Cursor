@@ -67,11 +67,14 @@ Step 7  确认并生成      展示配置摘要，确认后生成文件
 
 ```
 your-project/
-├── .cursor/agents/           # Cursor 子代理配置
-│   ├── product-agent.md      # 产品经理
-│   ├── frontend-agent.md     # 前端工程师
-│   ├── backend-agent.md      # 后端工程师
-│   └── test-agent.md         # 测试工程师
+├── .cursor/
+│   ├── agents/               # Cursor 子代理配置
+│   │   ├── product-agent.md  # 产品经理
+│   │   ├── frontend-agent.md # 前端工程师
+│   │   ├── backend-agent.md  # 后端工程师
+│   │   └── test-agent.md     # 测试工程师
+│   └── rules/
+│       └── project-manager.mdc  # 主Agent行为准则（自动加载）
 ├── docs/
 │   ├── PRD.md                # PRD 骨架模板
 │   └── PRD-example.md        # 完整 PRD 示例（可选）
@@ -157,6 +160,8 @@ PRD-Driven_AI_Team_For_Cursor/
 │   │   ├── backend-agent.md.tpl
 │   │   ├── test-agent.md.tpl
 │   │   └── custom-agent.md.tpl
+│   ├── rules/
+│   │   └── project-manager.mdc.tpl  # 主Agent行为准则模板
 │   ├── README.md.tpl           # 项目 README 模板
 │   ├── PRD-skeleton.md.tpl     # PRD 骨架模板
 │   └── PRD-example.md          # 完整 PRD 示例

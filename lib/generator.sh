@@ -112,6 +112,24 @@ build_tech_table() {
   echo -e "$table"
 }
 
+# ── Build agent list for project-manager Rule ──────────────────────
+build_agent_list() {
+  local list=""
+  IFS='|' read -ra members <<< "$TEAM_MEMBERS"
+  for member in "${members[@]}"; do
+    local agent_name
+    agent_name=$(member_to_agentname "$member")
+    case "$member" in
+      "产品经理")         list+="- \`${agent_name}\`：产品经理，负责 PRD 维护和需求设计\n" ;;
+      "前端开发工程师")   list+="- \`${agent_name}\`：前端工程师，负责前端开发 + UI 设计\n" ;;
+      "后端开发工程师")   list+="- \`${agent_name}\`：后端工程师，负责 API 和数据库开发\n" ;;
+      "测试工程师")       list+="- \`${agent_name}\`：测试工程师，负责接口测试和 E2E 测试\n" ;;
+      *)                  list+="- \`${agent_name}\`：${member}\n" ;;
+    esac
+  done
+  printf '%b' "$list"
+}
+
 # ── Build team diagram for README ───────────────────────────────────
 build_team_diagram() {
   local diagram=""
@@ -472,6 +490,7 @@ generate_files() {
 
   # ── Create directory structure ──
   mkdir -p "$target_dir/.cursor/agents"
+  mkdir -p "$target_dir/.cursor/rules"
   mkdir -p "$target_dir/docs"
 
   # ── Generate agent configs ──
@@ -542,6 +561,14 @@ generate_files() {
     esac
     print_success ".cursor/agents/$agent_file"
   done
+
+  # ── Generate project-manager Rule ──
+  local agent_list
+  agent_list=$(build_agent_list)
+  render_template_multiline "$TEMPLATE_DIR/rules/project-manager.mdc.tpl" "$target_dir/.cursor/rules/project-manager.mdc" \
+    "PROJECT_NAME=$PROJECT_NAME" \
+    "AGENT_LIST=$agent_list"
+  print_success ".cursor/rules/project-manager.mdc"
 
   # ── Generate README ──
   local tech_table team_diagram agent_roles_detail

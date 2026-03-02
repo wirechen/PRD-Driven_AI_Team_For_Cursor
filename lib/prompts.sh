@@ -458,6 +458,8 @@ step_confirm() {
     agent_file=$(member_to_filename "$member")
     echo -e "      ${GREEN}$agent_file${NC}"
   done
+  echo -e "    .cursor/rules/"
+  echo -e "      ${GREEN}project-manager.mdc${NC}"
   echo -e "    docs/"
   [ "$PRD_MODE" != "skip" ] && echo -e "      ${GREEN}PRD.md${NC}"
   [ "$PRD_MODE" = "example" ] && echo -e "      ${GREEN}PRD-example.md${NC}"
