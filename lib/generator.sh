@@ -112,6 +112,97 @@ build_tech_table() {
   echo -e "$table"
 }
 
+# ── Build project structure for README ───────────────────────────────
+build_project_structure() {
+  local proj="${PROJECT_NAME}/"
+  local tree=""
+  tree+="${proj}\n"
+  tree+="├── .cursor/agents/         # 子代理配置\n"
+  tree+="├── docs/                   # PRD、设计文档、测试报告\n"
+  tree+="│   ├── PRD.md              # PRD 主索引（产品概述+模块索引+变更日志）\n"
+  tree+="│   ├── prd/                # 各模块子 PRD\n"
+  tree+="│   ├── test-reports/      # 测试报告（YYYY-MM-DD-描述.md）\n"
+  tree+="│   ├── bugfix-logs/       # Bug 修复记录（YYYY-MM-DD-描述.md）\n"
+  tree+="│   └── changelogs/        # 需求变更记录（YYYY-MM-DD-描述.md）\n"
+  [ "$HAS_FRONTEND" = true ] && tree+="├── <前端目录>/             # Web 前端\n│   └── e2e/                # Playwright E2E 测试\n"
+  [ "$HAS_MINIAPP" = true ] && tree+="├── <小程序目录>/             # 微信小程序\n"
+  tree+="├── <后端目录>/             # 后端服务\n"
+  tree+="└── README.md               # 本文件\n"
+  echo -e "$tree"
+}
+
+# ── Build tech specs for README ──────────────────────────────────────
+build_tech_specs() {
+  cat << 'TECH_SPECS_EOF'
+### 后端 API 规范
+
+**统一响应格式**：
+```json
+{"code": 0, "message": "success", "data": {}}
+```
+
+**HTTP 方法约定**：
+- `GET` 查询
+- `POST` 创建
+- `PUT` 更新/操作
+- `DELETE` 删除
+
+### 前端规范
+
+- 与后端 API 对接时，确保字段名和 HTTP 方法与后端一致
+- 类型定义、状态管理按项目约定
+
+### 数据库规范
+
+- 使用 ORM 进行数据库操作
+- 迁移脚本管理表结构变更
+- 所有表建议有 `created_at` 字段
+TECH_SPECS_EOF
+}
+
+# ── Build quickstart for README ──────────────────────────────────────
+build_quickstart() {
+  cat << 'QUICKSTART_EOF'
+### 快速启停（如有 start.sh）
+
+```bash
+bash start.sh    # 启动所有服务
+bash stop.sh     # 停止所有服务
+```
+
+### 手动启动
+
+#### 后端服务
+```bash
+cd <后端目录>
+# 安装依赖并启动（具体命令见项目 README）
+```
+
+#### 前端（如有）
+```bash
+cd <前端目录>
+npm install && npm run dev
+```
+
+### E2E 测试
+```bash
+cd <前端目录>
+npx playwright test e2e/
+```
+QUICKSTART_EOF
+}
+
+# ── Build FAQ for README ──────────────────────────────────────────────
+build_faq() {
+  cat << 'FAQ_EOF'
+### 已解决的典型问题
+
+| 问题 | 根因 | 修复方案 |
+|------|------|----------|
+| 根据项目实际情况补充 | | |
+FAQ_EOF
+}
+
 # ── Build agent list for project-manager Rule ──────────────────────
 build_agent_list() {
   local list=""
@@ -217,6 +308,28 @@ build_frontend_duties() {
   echo -e "$duties"
 }
 
+# ── Build product-agent placeholders ────────────────────────────────
+build_user_roles() {
+  echo "根据项目实际情况在 PRD 中定义用户角色（如：管理员/普通用户/访客等）"
+}
+
+build_tech_architecture() {
+  local arch=""
+  [ "$HAS_FRONTEND" = true ] && arch+="- Web 端：$TECH_FRONTEND\n"
+  [ "$HAS_MINIAPP" = true ] && arch+="- 小程序端：$TECH_MINIAPP\n"
+  arch+="- 后端服务：$TECH_BACKEND\n"
+  arch+="- 数据库：$TECH_DB"
+  echo -e "$arch"
+}
+
+build_business_rules() {
+  echo "根据业务域在 PRD 中定义核心业务规则"
+}
+
+build_design_style() {
+  echo "根据产品定位确定视觉风格（如极简、商务、年轻化等）"
+}
+
 # ── Build frontend tech stack detail ────────────────────────────────
 build_frontend_tech_detail() {
   local detail=""
@@ -240,23 +353,23 @@ build_backend_tech_detail() {
 build_web_e2e_section() {
   if [ "$HAS_FRONTEND" = true ]; then
     cat << 'WEB_E2E_EOF'
-### Web 页面 E2E 测试（Playwright）
+### 管理后台/Web 页面功能测试（E2E）
 
-使用 Playwright 对管理后台/Web 页面进行端到端自动化测试。
+使用 Playwright 对管理后台（React Web）进行端到端页面功能测试。
 
-#### Playwright 使用规范
-- 项目前端目录下安装 Playwright：`npm install -D @playwright/test && npx playwright install`
-- 测试脚本存放在前端项目的 `e2e/` 目录，文件命名 `*.spec.ts`
-- 运行测试：`npx playwright test e2e/xxx.spec.ts`
-- 截图保存到 `test-screenshots/` 目录
+#### 测试流程
+- 打开页面 → 模拟用户操作（点击、输入、选择） → 验证页面状态和数据
 
 #### 测试覆盖要求
-- 登录/登出流程
-- 核心页面导航和菜单切换
-- 表单提交（含校验、成功/失败反馈）
-- 列表展示（分页、筛选、搜索）
-- 弹窗确认（删除、审核等操作）
-- 文件上传/下载
+- 登录、导航、表单提交、列表展示、弹窗确认、文件上传等
+
+#### Playwright 使用规范
+- 项目已安装 Playwright（前端项目目录下）
+- 运行测试：`cd <前端目录> && npx playwright test e2e/xxx.spec.ts`
+- 编写新测试脚本时参考已有的 `e2e/*.spec.ts`
+- 测试脚本存放在前端项目的 `e2e/` 目录
+- 测试完成后截图保存到 `test-screenshots/` 目录
+- 测试前确保后端和前端服务已启动
 
 #### Playwright 常用 API
 
@@ -319,7 +432,9 @@ npm install miniprogram-automator jest --save-dev
 | `page.waitFor(ms \| selector)` | 等待时间或元素出现 |
 | `element.tap()` | 点击元素 |
 | `element.input(text)` | 输入文本 |
+| `miniProgram.screenshot({ path })` | 全屏截图 |
 | `page.data` | 获取页面 data（用于断言） |
+| `element.trigger(event, detail)` | 触发事件 |
 | `page.callMethod(method, ...args)` | 调用页面方法 |
 
 #### 注意事项
@@ -358,6 +473,23 @@ build_miniapp_tech() {
   if [ "$HAS_MINIAPP" = true ]; then
     echo "- 小程序 E2E：miniprogram-automator + Jest"
   fi
+}
+
+build_test_accounts() {
+  echo "| 角色 | 账号 | 密码 |
+|------|------|------|
+| 请根据项目在 PRD 中定义测试账号 |"
+}
+
+build_service_urls() {
+  local urls="| 服务 | 地址 |
+|------|------|
+| 后端API | http://localhost:8000 |
+| 前端 | http://localhost:5173 |"
+  [ "$HAS_MINIAPP" = true ] && urls+="
+| 小程序项目路径 | 项目根目录/<小程序目录> |
+| 微信开发者工具 CLI | /Applications/wechatwebdevtools.app/Contents/MacOS/cli (macOS) |"
+  echo "$urls"
 }
 
 # ── Install Cursor Skills ────────────────────────────────────────────
@@ -505,12 +637,19 @@ generate_files() {
     case "$member" in
       "产品经理")
         template_file="$TEMPLATE_DIR/agents/product-agent.md.tpl"
+        local user_roles tech_arch business_rules design_style
+        user_roles=$(build_user_roles)
+        tech_arch=$(build_tech_architecture)
+        business_rules=$(build_business_rules)
+        design_style=$(build_design_style)
         render_template_multiline "$template_file" "$target_dir/.cursor/agents/$agent_file" \
           "MODEL=$model" \
           "PROJECT_NAME=$PROJECT_NAME" \
           "PROJECT_DESC=$PROJECT_DESC" \
-          "PLATFORMS=$platforms_display" \
-          "TECH_STACK_SUMMARY=$tech_summary"
+          "USER_ROLES=$user_roles" \
+          "TECH_ARCHITECTURE=$tech_arch" \
+          "BUSINESS_RULES=$business_rules" \
+          "DESIGN_STYLE=$design_style"
         ;;
       "前端开发工程师")
         template_file="$TEMPLATE_DIR/agents/frontend-agent.md.tpl"
@@ -534,18 +673,22 @@ generate_files() {
         ;;
       "测试工程师")
         template_file="$TEMPLATE_DIR/agents/test-agent.md.tpl"
-        local web_e2e_section web_e2e_tech miniapp_section miniapp_tech
+        local web_e2e_section web_e2e_tech miniapp_section miniapp_tech test_accounts service_urls
         web_e2e_section=$(build_web_e2e_section)
         web_e2e_tech=$(build_web_e2e_tech)
         miniapp_section=$(build_miniapp_test_section)
         miniapp_tech=$(build_miniapp_tech)
+        test_accounts=$(build_test_accounts)
+        service_urls=$(build_service_urls)
         render_template_multiline "$template_file" "$target_dir/.cursor/agents/$agent_file" \
           "MODEL=$model" \
           "PROJECT_NAME=$PROJECT_NAME" \
           "WEB_E2E_SECTION=$web_e2e_section" \
           "WEB_E2E_TECH=$web_e2e_tech" \
           "MINIAPP_TEST_SECTION=$miniapp_section" \
-          "MINIAPP_TECH=$miniapp_tech"
+          "MINIAPP_TECH=$miniapp_tech" \
+          "TEST_ACCOUNTS=$test_accounts" \
+          "SERVICE_URLS=$service_urls"
         ;;
       *)
         template_file="$TEMPLATE_DIR/agents/custom-agent.md.tpl"
@@ -571,17 +714,25 @@ generate_files() {
   print_success ".cursor/rules/project-manager.mdc"
 
   # ── Generate README ──
-  local tech_table team_diagram agent_roles_detail
+  local tech_table team_diagram agent_roles_detail project_structure tech_specs quickstart faq
   tech_table=$(build_tech_table)
   team_diagram=$(build_team_diagram)
   agent_roles_detail=$(build_agent_roles_detail)
+  project_structure=$(build_project_structure)
+  tech_specs=$(build_tech_specs)
+  quickstart=$(build_quickstart)
+  faq=$(build_faq)
 
   render_template_multiline "$TEMPLATE_DIR/README.md.tpl" "$target_dir/README.md" \
     "PROJECT_NAME=$PROJECT_NAME" \
     "PROJECT_DESC=$PROJECT_DESC" \
     "TECH_TABLE=$tech_table" \
     "TEAM_DIAGRAM=$team_diagram" \
-    "AGENT_ROLES_DETAIL=$agent_roles_detail"
+    "AGENT_ROLES_DETAIL=$agent_roles_detail" \
+    "PROJECT_STRUCTURE=$project_structure" \
+    "TECH_SPECS=$tech_specs" \
+    "QUICKSTART=$quickstart" \
+    "FAQ=$faq"
   print_success "README.md"
 
   # ── Generate PRD ──
